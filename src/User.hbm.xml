@@ -4,6 +4,7 @@
 <!-- Generated 2016-11-26 23:16:50 by Hibernate Tools 3.4.0.CR1 -->
 <hibernate-mapping>
     <class name="com.Demo.entity.User" table="USER">
+     <cache usage="read-only"/>
         <id name="id" type="java.lang.Integer">
             <column name="ID" />
             <generator class="assigned" />

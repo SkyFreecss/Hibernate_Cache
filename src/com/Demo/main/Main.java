@@ -5,6 +5,10 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.service.ServiceRegistry;
+import org.hibernate.service.ServiceRegistryBuilder;
 
 import com.Demo.entity.User;
 import com.Demo.util.HibernateUtil;
@@ -12,26 +16,31 @@ import com.Demo.util.HibernateUtil;
 /**
  * @author SkyFreecss
  *
+ *一级缓存(如果你想拿我的项目测试一级缓存，请把User.hbm.xml中的添加的cache标签拿掉,测试二级缓存时再添加回来就行了。)
  *1.第二次查询同一个对象时，并没有再次执行数据库查询。
  *2.在不同的session中多次查询同一对象时，会执行多次数据库查询。
  *3.一级缓存中，持久化类的每个实例都具有唯一的OID(也就是说一级缓存只在当前session内，其它的session则不能使用)。
  *
+ *二级缓存
+ *在不同的session中查询同一对象时，不会再次执行数据库查询。
  */
 public class Main {
        public static void main(String args[])
        {
-    	   /*
-    	    * 1.
-    	   Session session = HibernateUtil.getSession();
-    	   User user = (User) session.get(User.class,1);
-    	   System.out.println(user.getUsername());
-
     	   
-           user = (User) session.get(User.class,1);
+    	/*
+    	 * 1.
+		   Session session = HibernateUtil.getSession();
+           User user = (User) session.get(User.class,1);
+           System.out.println(user.getUsername());
+           
+           
+           
+           user = (User) session.get(User.class, 1);
            System.out.println(user.getUsername());
            session.close();
-           */
-    	   
+          
+    	  */ 
     	 //-----------------------------------------------
     	   /*
     	    * 2.
@@ -82,23 +91,24 @@ public class Main {
     	   
     	   //-----------------------------------------------
     	   
-    	   Session session = HibernateUtil.getSession();
-    	   Query query = session.createQuery("from User");
-    	   List<User> list = query.list();
-    	   for(User user:list)
-    	   {
-    		   System.out.println(user.getUsername());
-    	   }
     	   
-    	   /*可以看出，经由Query的list方法查询后，生成了一个缓存，
-    	    * 所以Iterator的iterate方法通过每一个编号在缓存中进行查询。
-    	    */
-    	   Iterator it = query.iterate();
-    	   while(it.hasNext())
-    	   {
-    		   User user = (User) it.next();
-    		   System.out.println(user.getUsername());
-    	   }
+//    	   Session session = HibernateUtil.getSession();
+//    	   Query query = session.createQuery("from User");
+//    	   List<User> list = query.list();
+//    	   for(User user:list)
+//    	   {
+//    		   System.out.println(user.getUsername());
+//    	   }
+//    	   
+//    	   /*可以看出，经由Query的list方法查询后，生成了一个缓存，
+//    	    * 所以Iterator的iterate方法通过每一个编号在缓存中进行查询。
+//    	    */
+//    	   Iterator it = query.iterate();
+//    	   while(it.hasNext())
+//    	   {
+//    		   User user = (User) it.next();
+//    		   System.out.println(user.getUsername());
+//    	   }
     	  
     	  //----------------------------------------------
     	   /**
@@ -128,6 +138,16 @@ public class Main {
 
            iterate()会使用缓存。 
     	   */
+    	    //****************************************************************
+    	   
+    	   //二级缓存
     	    
+    	   Session session = HibernateUtil.getSession();
+    	   User user = (User)session.get(User.class, 1);
+    	   System.out.println(user.getUsername());
+    	   
+    	   session = HibernateUtil.getSession();
+    	   user = (User)session.get(User.class, 1);
+    	   System.out.println(user.getUsername());
        }
 }
